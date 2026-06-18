@@ -1,0 +1,5 @@
+{
+	"port": 8000,
+	"interval_min": 15,
+	"remote_file": "webcams/weather.json"
+}
