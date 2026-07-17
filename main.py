@@ -294,10 +294,12 @@ def update_history_and_cleanup(dt_obj, wind_avg, gust_max, rain_rate_avg, daily_
     """Update 24h and 7d history views and upload current compact payload."""
     global raw_history_24h, history_7days, wind_dir_1h_raw
 
-    now = datetime.now()
-    cutoff_24h = now - timedelta(hours=24)
-    cutoff_1h = now - timedelta(hours=1)
-    cutoff_7days = (now - timedelta(days=7)).date()
+    # Anchor cleanup windows to the interval timestamp, not wall-clock now,
+    # so the exported series keeps exact interval-aligned windows.
+    dt_obj_cut = dt_obj.replace(second=0, microsecond=0)
+    cutoff_24h = dt_obj_cut - timedelta(hours=24)
+    cutoff_1h = dt_obj_cut - timedelta(hours=1)
+    cutoff_7days = (dt_obj_cut - timedelta(days=7)).date()
 
     raw_history_24h.append((dt_obj, wind_avg, gust_max, rain_rate_avg, temp_avg, humidity_avg, wind_dir_avg, uv_max, uv_avg, vpd_avg, solar_radiation_avg))
     raw_history_24h = [item for item in raw_history_24h if item[0] >= cutoff_24h]
